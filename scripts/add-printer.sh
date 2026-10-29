@@ -10,7 +10,7 @@
 # Guarantees: never sets the default printer; refuses to overwrite an
 # existing queue unless --force; only accepts usb:// URIs that look like an
 # HP LaserJet 1022 (unless --force).
-set -u
+set -eu
 
 PPD=/Library/Printers/PPDs/Contents/Resources/HP1022-Gutenprint-hp-lj_1022.ppd
 QUEUE=HP_LaserJet_1022
@@ -39,8 +39,8 @@ case "$QUEUE" in *[!A-Za-z0-9_-]*) die "invalid queue name '$QUEUE' (A-Za-z0-9_-
 if [ -z "$URI" ]; then
   echo "detected USB printers:"
   lpinfo -v 2>/dev/null | awk '$2 ~ /^usb:\/\// {print "  " $2}' || true
-  CAND=$(lpinfo -v 2>/dev/null | awk '$2 ~ /^usb:\/\/HP\/LaserJet_?1022/i {print $2}')
-  [ -z "$CAND" ] && CAND=$(lpinfo -v 2>/dev/null | awk '$2 ~ /^usb:\/\// && tolower($2) ~ /hp.*1022/ {print $2}')
+  CAND=$(lpinfo -v 2>/dev/null | awk '
+    tolower($2) ~ /^usb:\/\/(hp|hewlett-packard)\/laserjet(%20|_)?1022(\?|$)/ {print $2}')
   n=$(printf '%s\n' "$CAND" | grep -c . || true)
   if [ "$n" -eq 1 ]; then
     URI=$CAND
@@ -68,8 +68,8 @@ fi
 # ---- refuse to clobber an existing queue ---------------------------------
 if lpstat -p "$QUEUE" >/dev/null 2>&1; then
   if [ "$FORCE" -eq 1 ]; then
-    echo "queue '$QUEUE' exists — replacing it (--force)"
-    [ "$DRYRUN" -eq 0 ] && lpadmin -x "$QUEUE"
+    # lpadmin -p updates an existing queue; keep it if reconfiguration fails.
+    echo "queue '$QUEUE' exists — updating it (--force)"
   else
     die "queue '$QUEUE' already exists — choose another -n name or pass --force"
   fi
@@ -85,9 +85,9 @@ if [ "$DRYRUN" -eq 1 ]; then echo "dry-run: nothing done."; exit 0; fi
 
 lpadmin -p "$QUEUE" -E -v "$URI" -P "$PPD" \
   -D "HP LaserJet 1022 (Gutenprint arm64, experimental)" \
-  -o printer-is-shared=false
-cupsenable "$QUEUE"
-cupsaccept "$QUEUE"
+  -o printer-is-shared=false || die "could not configure queue '$QUEUE'"
+cupsenable "$QUEUE" || die "could not enable queue '$QUEUE'"
+cupsaccept "$QUEUE" || die "could not accept jobs for queue '$QUEUE'"
 echo "queue '$QUEUE' created and enabled."
 echo "test:   lp -d '$QUEUE' /etc/cups/cupsd.conf   # prints a text page"
 echo "remove: sudo lpadmin -x '$QUEUE'"

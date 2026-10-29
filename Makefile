@@ -23,6 +23,7 @@ test:
 	./tests/test-payload.sh
 	./tests/test-dependencies.sh
 	./tests/test-security.sh
+	./tests/test-helpers.sh
 
 clean:
 	rm -rf stage build/gutenprint-*/.build-stamp 2>/dev/null || true

@@ -16,6 +16,7 @@ make test          # runs everything in tests/
 | `tests/test-payload.sh` | install-path whitelist, no SIP/other-vendor paths, only our executables, PPD syntax + filter path resolves inside payload, pkg has zero install scripts |
 | `tests/test-dependencies.sh` | `otool -L` audit (no Homebrew/user/tmp paths), filter executes, genppd resolves XML data, `cupsfilter` end-to-end chain smoke test |
 | `tests/test-security.sh` | forbidden-operation grep audit (Canon paths, `lpadmin -d`, queue scans, `rm -rf` on shared dirs, curl-pipe-shell, SIP writes), uninstall guardrails |
+| `tests/test-helpers.sh` | isolated uninstall modification protection, HP 1022 URI selection, queue command failures and safe forced updates (mocked CUPS; no admin rights) |
 
 ## Hardware matrix — DO NOT mark done without a real printout
 

@@ -35,13 +35,20 @@ HASHES="$PREFIX/share/doc/payload-sha256sums.txt"
 [ -f "$MANIFEST" ] || die "no manifest found — cannot prove what was installed; nothing removed"
 echo "manifest: $MANIFEST"
 
+# The sorted manifest removes the installed hash file before the XML and PPD.
+# Keep its contents for the entire run, including after that file is removed.
+HASH_DATA=
+if [ -f "$HASHES" ]; then
+  HASH_DATA=$(cat "$HASHES") || die "cannot read $HASHES; nothing removed"
+fi
+
 SKIP=0 RM=0
 remove_file() {
   f=$1
   [ -e "$f" ] || { echo "  absent   $f"; return; }
   # user-modification guard
-  if [ "$FORCE" -eq 0 ] && [ -f "$HASHES" ]; then
-    want=$(awk -v p="$f" '{ sub(/^\.\//,"",$2); if ("/"$2==p) print $1 }' "$HASHES" | head -1)
+  if [ "$FORCE" -eq 0 ] && [ -n "$HASH_DATA" ]; then
+    want=$(printf '%s\n' "$HASH_DATA" | awk -v p="$f" '{ sub(/^\.\//,"",$2); if ("/"$2==p) print $1 }' | head -1)
     if [ -n "$want" ]; then
       got=$(shasum -a 256 "$f" 2>/dev/null | awk '{print $1}')
       if [ "$got" != "$want" ]; then
