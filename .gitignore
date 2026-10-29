@@ -1,0 +1,18 @@
+# Build products — never committed
+build/
+stage/
+dist/
+sources/*.tar.xz
+sources/*.tar.gz
+sources/*.tgz
+sources/download.tmp
+
+# macOS noise
+.DS_Store
+._*
+AppleDouble
+
+# Editor
+*.swp
+*~
+.devin/

@@ -1,0 +1,51 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  build:
+    runs-on: macos-15   # Apple Silicon
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch pinned sources
+        run: ./scripts/fetch-source.sh
+
+      - name: Build Gutenprint payload
+        run: ./scripts/build.sh
+
+      - name: Verify payload
+        run: ./scripts/verify.sh
+
+      - name: Run tests
+        run: make test
+
+      - name: Build unsigned pkg
+        run: ./scripts/package.sh "0.1.0+ci.${{ github.run_number }}"
+
+      - name: Show package signature status
+        run: |
+          ls dist/
+          pkgutil --check-signature dist/HP1022-Gutenprint-*.pkg || true
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: hp1022-gutenprint-pkg
+          path: |
+            dist/*.pkg
+            dist/*.sha256
+            dist/payload-manifest.txt
+            dist/payload-sha256sums.txt
+          retention-days: 30
+
+# NOTE: no release job yet. A release must only run after hardware testing
+# (docs/testing.md H4+H12) passes AND Developer ID signing + Apple
+# notarization are provisioned. Until then every artifact is unsigned and
+# clearly labelled as such.
