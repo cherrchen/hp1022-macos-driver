@@ -33,6 +33,24 @@ make distclean # rm build+dist+stage
   pass on a physical 1022.
 - Upstream source stays unmodified; needed changes go in `patches/`.
 
+## Commit conventions
+
+All commits use the form:
+
+```
+type(scope): short imperative description
+```
+
+- `type` — `feat` `fix` `docs` `build` `test` `ci` `refactor` `chore`
+  `security`
+- `scope` — the area touched, e.g. `scripts` `tests` `docs` `ci`
+  `build` `ppd` `pkg` `install` `uninstall` `deps` `license`
+- No attribution/trailer footers (no Co-Authored-By, no tool signatures).
+- Body optional, wrapped at ~72 cols, explains the *why*.
+
+Examples: `feat(install): add --dry-run mode`, `fix(ppd): force LC_ALL=C
+in genppd call`, `docs(feasibility): record PCL output proof`.
+
 ## Conventions
 
 - All scripts are POSIX `sh`, `set -eu`, resolve repo root from `$0`.
