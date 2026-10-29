@@ -66,11 +66,11 @@ dist/       (generated) pkg + manifest + hashes
 
 ## Licenses & provenance
 
-- **Gutenprint 5.3.5** — GPL-2.0, unmodified upstream source from
+- **Gutenprint 5.3.5** — GPL-2.0-or-later, unmodified upstream source from
   SourceForge (hash-pinned). Corresponding source: `sources/` tarball or
   `make fetch`. Copyright/author files ship in the payload under
   `share/doc/`.
-- **This project's scripts/docs** — MIT (see `LICENSE`).
+- **This project's scripts/docs** — GPL-2.0-or-later (see `LICENSE`).
 - No HP or Apple proprietary files are included or redistributed.
 
 **This project is not affiliated with HP or Apple.**
@@ -119,5 +119,6 @@ sudo ./scripts/uninstall.sh             # 按清单卸载,保留打印队列
 
 ### 许可
 
-Gutenprint 为 GPL-2.0(未修改上游源码,锁定 SHA-256);本项目脚本与
-文档为 MIT。**本项目与 HP、Apple 均无关联。**
+Gutenprint 为 GPL-2.0-or-later(未修改上游源码,锁定 SHA-256);本项目
+脚本与文档同样采用 GPL-2.0-or-later(见 `LICENSE`)。
+**本项目与 HP、Apple 均无关联。**
