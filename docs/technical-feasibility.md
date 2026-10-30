@@ -1,7 +1,8 @@
 # Technical Feasibility — HP LaserJet 1022 on Apple Silicon macOS
 
-Status: **UNVERIFIED on real hardware** — Phase 0 research document.
-Last updated: 2026-10-29. Target platform: Mac (Apple Silicon, M2), macOS 15.8 Sequoia, USB.
+Status: **VERIFIED on real hardware** — full matrix H1–H12 passed
+2026-10-30 on a physical 1022 (FWVER 20050401), see docs/testing.md.
+Last updated: 2026-10-30. Target platform: Mac (Apple Silicon, M2), macOS 15.8 Sequoia, USB.
 
 This document answers the question required before implementation:
 
@@ -165,17 +166,28 @@ this specific model.
 | Gutenprint 5.3.5 contains an `hp-lj_1022` model | **Confirmed** (pcl.xml:560) |
 | Gutenprint emits PCL 5e raster for it | **Confirmed** (print-pcl.c model 6 + byte-level proof, §1) |
 | Built filter runs as a CUPS filter on this Mac | **Confirmed** (real pipeline, §1) |
-| The 1022 hardware accepts PCL 5e | **Contested — probably false** |
+| The 1022 hardware accepts PCL 5e | **Confirmed** (2026-10-30 H4: filter's own PCL stream printed a clean text page; the edla "ZJS-only" claim does not hold for this unit, FWVER 20050401) |
 | The 1022 needs a firmware upload | **No** (not in foo2zjs firmware tables) |
 | The 1022 accepts ZjStream | **Confirmed** (foo2zjs-z1 target device, Foomatic driver-of-record) |
 
-**Verdict: proceed with the Gutenprint build as the primary (and only
-in-scope) path, but do not claim hardware support.** Everything else in the
-pipeline — packaging, PPD handling, queue setup, uninstall, tests — is
-identical whichever raster filter is used, so no work is wasted if the
-fallback is needed.
+**Verdict: the Gutenprint PCL path works on real hardware.** The 2026-10-30
+H4 test sent the filter's own PCL 5e raster output (byte-identical to what
+cupsd produces via the PPD) to a physical 1022, which printed a clean page.
+The edla "ZJS-only" claim (§2.3) is therefore not universal — at least the
+revision shipped with FWVER 20050401 accepts PCL. This also means the "no
+PCL interpreter" inference from `CMD:ACL` was too strong: the 1284 ID does
+not advertise PCL, yet the interpreter accepts it.
 
-### Fallback path (foo2zjs) — only if hardware testing fails
+### Fallback path (foo2zjs) — no longer needed
+
+Hardware testing settled the protocol question (H12 pass, 2026-10-30): the
+printer accepts PCL, so foo2zjs/ZjStream is not implemented. Kept here for
+the record in case a different hardware revision regresses: a `foo2zjs-z1`
+CUPS raster filter + 1022 PPD (GPL, OpenPrinting/foo2zjs), no firmware
+upload needed for this model (§2.4), confined to one extra filter binary,
+one PPD, and the same install/uninstall machinery.
+
+<details><summary>Original fallback note (pre-verdict)</summary>
 
 If a real 1022 rejects the PCL stream, the alternative is a `foo2zjs-z1`
 CUPS raster filter + 1022 PPD (GPL, OpenPrinting/foo2zjs). No firmware
@@ -184,15 +196,15 @@ filter binary, one PPD, and the same install/uninstall machinery. It is
 *not* built in this iteration — per project rules it is only added with
 evidence that Gutenprint's PCL output fails on real hardware.
 
-### How the question gets settled definitively (needs the printer)
+</details>
 
-1. `system_profiler SPUSBDataType` / USB probe: capture the IEEE-1284
-   `CMD` field. `CMD:ACL` alone ⇒ no PCL interpreter advertised.
-2. Send the built PPD + `rastertogutenprint.5.3` output to the printer.
-   Page prints ⇒ PCL path works (Foomatic lang entry vindicated).
-   Garbage/silence ⇒ ZjStream-only, move to foo2zjs.
-3. Both steps are scripted in `docs/testing.md` and require the physical
-   device.
+### How the question was settled (executed 2026-10-30)
+
+1. `system_profiler SPUSBDataType`: `CMD:ACL` only — no PCL advertised
+   (FWVER 20050401, S/N JM1ALN6).
+2. The filter's own PCL 5e output (840,924 bytes for a cupsd.conf text
+   page) was delivered to the printer via `lp -o raw` — **a clean page
+   printed**. PCL path confirmed; garbage/silence did not occur.
 
 ## 5. Evidence index
 

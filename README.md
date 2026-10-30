@@ -8,11 +8,12 @@ A minimal, auditable driver package that tries to make the **HP LaserJet
 extensions, no Rosetta.
 
 > ⚠️ **Status: Experimental — hardware testing required.**
-> The LaserJet 1022 is most likely a host-based **ZjStream** printer and
-> Gutenprint's `hp-lj_1022` entry emits **PCL 5e**. Whether the hardware
-> accepts PCL is unresolved — the evidence leans towards *no*. Everything
-> builds and installs correctly; actual printing is unverified. Details and
-> the foo2zjs fallback plan: [`docs/technical-feasibility.md`](docs/technical-feasibility.md).
+> The PCL path **works on real hardware**: on 2026-10-30 a physical 1022
+> (FWVER 20050401) printed Gutenprint's PCL 5e output — through the raw
+> protocol probe *and* the full installed CUPS pipeline. See
+> [`docs/testing.md`](docs/testing.md): H1–H10 + H12 pass, H11 open.
+> Remaining risks: single-unit verification, unsigned/unnotarized pkg.
+> Analysis: [`docs/technical-feasibility.md`](docs/technical-feasibility.md).
 
 ## Supported
 
@@ -78,8 +79,9 @@ dist/       (generated) pkg + manifest + hashes
 ## Known limitations
 
 - Single printer model; no network printers; USB only.
-- PCL-path printing unverified on hardware — may produce no output at all
-  (then the ZjStream/foo2zjs path becomes necessary).
+- Verified on one physical 1022 (FWVER 20050401) only — other hardware
+  revisions untested (the foo2zjs/ZjStream fallback is documented if a
+  different unit rejects PCL).
 - Package unsigned; notarization requires an Apple Developer ID (CI hook
   exists, keys not provisioned).
 
@@ -92,11 +94,11 @@ Apple Silicon macOS 上打印 —— 从 **Gutenprint 5.3.5** 官方源码构建
 不使用预编译二进制,不改 SIP,不装内核扩展,不需要 Rosetta。
 
 > ⚠️ **当前状态:实验性 —— 需要实机验证。**
-> LaserJet 1022 很可能只支持 host-based **ZjStream** 协议,而 Gutenprint
-> 的 `hp-lj_1022` 输出的是 **PCL 5e**。硬件是否接受 PCL 尚无定论(证据
-> 偏向“不支持”)。构建、安装流程可用,但能否真正打印未经验证。详见
-> [`docs/technical-feasibility.md`](docs/technical-feasibility.md),备选
-> 方案为 foo2zjs。
+> **PCL 路线已在实机验证通过**:2026-10-30 一台物理 1022
+> (FWVER 20050401) 完整打印了 Gutenprint 的 PCL 5e 输出——raw 协议
+> 探测与完整 CUPS 安装管道均成功。见 [`docs/testing.md`](docs/testing.md):
+> H1–H10 + H12 通过,H11 待测。其余风险:仅验证单台设备;pkg 未签名
+> 未公证。分析见 [`docs/technical-feasibility.md`](docs/technical-feasibility.md)。
 
 ### 支持范围
 
