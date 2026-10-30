@@ -2,17 +2,17 @@
 
 **English** · [中文](#中文说明)
 
-A minimal, auditable driver package that tries to make the **HP LaserJet
+A minimal, auditable driver package that makes the **HP LaserJet
 1022** (USB) print on Apple-Silicon macOS, built from upstream
 **Gutenprint 5.3.5** source — no prebuilt blobs, no SIP changes, no kernel
 extensions, no Rosetta.
 
-> ⚠️ **Status: Experimental — hardware testing required.**
-> The PCL path **works on real hardware**: on 2026-10-30 a physical 1022
-> (FWVER 20050401) printed Gutenprint's PCL 5e output — through the raw
-> protocol probe *and* the full installed CUPS pipeline. See
-> [`docs/testing.md`](docs/testing.md): H1–H10 + H12 pass, H11 open.
-> Remaining risks: single-unit verification, unsigned/unnotarized pkg.
+> ⚠️ **Status: working on real hardware — still experimental distribution.**
+> On 2026-10-30 a physical 1022 (FWVER 20050401) printed Gutenprint's PCL 5e
+> output through the full installed CUPS pipeline, and the entire hardware
+> matrix in [`docs/testing.md`](docs/testing.md) passed (H1–H12 ☑).
+> Caveats: verified on a single unit; the package is unsigned/unnotarized;
+> CUPS marks PPD-class drivers deprecated on future macOS.
 > Analysis: [`docs/technical-feasibility.md`](docs/technical-feasibility.md).
 
 ## Supported
@@ -84,21 +84,23 @@ dist/       (generated) pkg + manifest + hashes
   different unit rejects PCL).
 - Package unsigned; notarization requires an Apple Developer ID (CI hook
   exists, keys not provisioned).
+- `lpadmin` warns that PPD-class drivers are deprecated in a future CUPS
+  release — fine on macOS 15.x, may need an IPP-everywhere revisit later.
 
 ---
 
 ## 中文说明
 
-一个最小化、可审计的驱动包,尝试让 **HP LaserJet 1022**(USB)在
+一个最小化、可审计的驱动包,让 **HP LaserJet 1022**(USB)在
 Apple Silicon macOS 上打印 —— 从 **Gutenprint 5.3.5** 官方源码构建,
 不使用预编译二进制,不改 SIP,不装内核扩展,不需要 Rosetta。
 
-> ⚠️ **当前状态:实验性 —— 需要实机验证。**
-> **PCL 路线已在实机验证通过**:2026-10-30 一台物理 1022
-> (FWVER 20050401) 完整打印了 Gutenprint 的 PCL 5e 输出——raw 协议
-> 探测与完整 CUPS 安装管道均成功。见 [`docs/testing.md`](docs/testing.md):
-> H1–H10 + H12 通过,H11 待测。其余风险:仅验证单台设备;pkg 未签名
-> 未公证。分析见 [`docs/technical-feasibility.md`](docs/technical-feasibility.md)。
+> ⚠️ **当前状态:实机可打印 —— 分发层面仍属实验性。**
+> 2026-10-30 一台物理 1022(FWVER 20050401)经完整 CUPS 安装管道
+> 打印成功,[`docs/testing.md`](docs/testing.md) 硬件矩阵全部通过
+> (H1–H12 ☑)。注意:仅验证过这一台设备;pkg 未签名未公证;
+> CUPS 已将 PPD 类驱动标记为弃用。分析见
+> [`docs/technical-feasibility.md`](docs/technical-feasibility.md)。
 
 ### 支持范围
 
