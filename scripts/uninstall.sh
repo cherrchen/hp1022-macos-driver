@@ -82,8 +82,8 @@ if [ -d "$PREFIX" ]; then
       echo "  kept     $d (not empty)"
     fi
   done
-  # the prefix root itself
-  if [ -z "$(ls -A "$PREFIX" 2>/dev/null)" ]; then
+  # the prefix root itself (the depth-first loop may already have removed it)
+  if [ -d "$PREFIX" ] && [ -z "$(ls -A "$PREFIX" 2>/dev/null)" ]; then
     if [ "$DRYRUN" -eq 1 ]; then echo "  would rmdir $PREFIX"; else rmdir "$PREFIX" && echo "  rmdir    $PREFIX"; fi
   fi
 else
