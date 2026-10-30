@@ -29,6 +29,10 @@ jobs:
       - name: Build unsigned pkg
         run: ./scripts/package.sh "0.1.0+ci.${{ github.run_number }}"
 
+      - name: Verify built package
+        # Runs only when a pkg exists; REQUIRE_PKG makes absence a failure.
+        run: REQUIRE_PKG=1 ./tests/test-package.sh
+
       - name: Show package signature status
         run: |
           ls dist/

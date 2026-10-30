@@ -24,6 +24,7 @@ test:
 	./tests/test-dependencies.sh
 	./tests/test-security.sh
 	./tests/test-helpers.sh
+	./tests/test-package.sh
 
 clean:
 	rm -rf stage build/gutenprint-*/.build-stamp 2>/dev/null || true
