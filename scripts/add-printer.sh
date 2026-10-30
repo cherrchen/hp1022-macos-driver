@@ -6,6 +6,7 @@
 #   sudo scripts/add-printer.sh -u 'usb://HP/LaserJet%201022?serial=...'
 #   sudo scripts/add-printer.sh -n MyQueue -u 'usb://...'
 #   scripts/add-printer.sh --dry-run -u 'usb://...'   # show what would happen
+#   scripts/add-printer.sh --ppd /path/to.ppd -u 'usb://...'  # pre-install test
 #
 # Guarantees: never sets the default printer; refuses to overwrite an
 # existing queue unless --force; only accepts usb:// URIs that look like an
@@ -18,13 +19,14 @@ URI=
 DRYRUN=0
 FORCE=0
 
-usage() { sed -n '2,14p' "$0"; exit "${1:-0}"; }
+usage() { sed -n '2,15p' "$0"; exit "${1:-0}"; }
 die() { echo "error: $*" >&2; exit 1; }
 
 while [ $# -gt 0 ]; do
   case "$1" in
     -u|--uri)   URI=$2; shift 2;;
     -n|--name)  QUEUE=$2; shift 2;;
+    -p|--ppd)   PPD=$2; shift 2;;
     --dry-run)  DRYRUN=1; shift;;
     --force)    FORCE=1; shift;;
     -h|--help)  usage 0;;
@@ -40,7 +42,8 @@ if [ -z "$URI" ]; then
   echo "detected USB printers:"
   lpinfo -v 2>/dev/null | awk '$2 ~ /^usb:\/\// {print "  " $2}' || true
   CAND=$(lpinfo -v 2>/dev/null | awk '
-    tolower($2) ~ /^usb:\/\/(hp|hewlett-packard)\/laserjet(%20|_)?1022(\?|$)/ {print $2}')
+    tolower($2) ~ /^usb:\/\/(hp|hewlett-packard)\// && \
+    tolower($2) ~ /laserjet(%20|_)?1022(\?|$)/ {print $2}')
   n=$(printf '%s\n' "$CAND" | grep -c . || true)
   if [ "$n" -eq 1 ]; then
     URI=$CAND
@@ -81,7 +84,10 @@ echo "  uri   : $URI"
 echo "  ppd   : $PPD"
 echo "  default printer: NOT changed"
 if [ "$DRYRUN" -eq 1 ]; then echo "dry-run: nothing done."; exit 0; fi
-[ "$(id -u)" = 0 ] || die "run with sudo to create the queue"
+# cupsd grants queue admin to root and to _lpadmin/admin group members.
+if [ "$(id -u)" != 0 ] && ! id -Gn | tr ' ' '\n' | grep -qxE '_lpadmin|admin'; then
+  die "run with sudo (or as an _lpadmin/admin user) to create the queue"
+fi
 
 lpadmin -p "$QUEUE" -E -v "$URI" -P "$PPD" \
   -D "HP LaserJet 1022 (Gutenprint arm64, experimental)" \
