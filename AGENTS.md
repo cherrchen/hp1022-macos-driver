@@ -4,9 +4,10 @@
 
 Single-model macOS printer driver package: HP LaserJet 1022 (USB) on
 Apple Silicon, built from Gutenprint 5.3.5 source. **Status: works on real
-hardware (matrix H1–H12 passed 2026-10-30) — unsigned, single-unit
-verification.** The PCL-vs-ZjStream question is settled: this 1022 accepts
-Gutenprint's PCL 5e. See `docs/technical-feasibility.md` for the record.
+hardware — matrix H1–H12 passed 2026-10-30 on one physical unit.**
+Self-serve model: users clone, `make package`, then `scripts/install.sh`.
+The PCL-vs-ZjStream question is settled: this 1022 accepts Gutenprint's
+PCL 5e. See `docs/technical-feasibility.md` for the record.
 
 ## Commands
 

@@ -15,7 +15,7 @@ Installs the HP LaserJet 1022 Gutenprint driver payload with sudo installer.
 After it finishes, add the printer yourself:
   - System Settings -> Printers & Scanners -> Add Printer, choose the
     "HP1022-Gutenprint" software entry, or
-  - run: sudo scripts/add-printer.sh
+  - run: scripts/add-printer.sh
 EOF
 }
 
@@ -53,4 +53,4 @@ echo "  /Library/Printers/HP1022-Gutenprint/"
 echo "  /Library/Printers/PPDs/Contents/Resources/HP1022-Gutenprint-hp-lj_1022.ppd"
 echo "Nothing else is changed (package has no install scripts)."
 sudo installer -pkg "$PKG" -target / -verbose
-echo "driver files installed. To create a queue: sudo scripts/add-printer.sh"
+echo "driver files installed. To create a queue: scripts/add-printer.sh"
